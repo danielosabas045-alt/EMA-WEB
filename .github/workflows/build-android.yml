@@ -1,0 +1,65 @@
+name: Compilar APK de EMA
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  build-apk:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Descargar código
+        uses: actions/checkout@v4
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Preparar EMA Android local
+        run: python3 android_prepare.py
+
+      - name: Configurar Java 17
+        uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Configurar Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '9.6.0'
+
+      - name: Configurar Android SDK
+        uses: android-actions/setup-android@v4
+        with:
+          packages: 'platform-tools'
+
+      - name: Instalar SDK Android
+        shell: bash
+        run: |
+          yes | sdkmanager --licenses > /dev/null || true
+          sdkmanager "platforms;android-36" "build-tools;36.0.0"
+
+      - name: Compilar APK
+        shell: bash
+        run: |
+          set -euo pipefail
+          gradle :app:assembleDebug --no-daemon --stacktrace
+          mkdir -p dist
+          cp app/build/outputs/apk/debug/app-debug.apk dist/EMA-Mayoreo.apk
+          ls -lh dist/EMA-Mayoreo.apk
+
+      - name: Publicar APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: EMA-Mayoreo-Android
+          path: dist/EMA-Mayoreo.apk
+          if-no-files-found: error
+          retention-days: 30

@@ -1,0 +1,87 @@
+name: EMA Web
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: ema-pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Descargar repositorio
+        uses: actions/checkout@v4
+
+      - name: Extraer EMA original
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          ZIP="$(find . -maxdepth 1 -type f -iname '*EMA-MAYOREO-WEB*.zip' -print -quit)"
+          test -n "$ZIP"
+
+          rm -rf extracted site
+          mkdir -p extracted site
+          unzip -q "$ZIP" -d extracted
+
+          INDEX="$(find extracted -type f -name 'index.html' -print -quit)"
+          test -n "$INDEX"
+
+          APP_DIR="$(dirname "$INDEX")"
+          cp -a "$APP_DIR"/. site/
+
+          rm -f site/ABRIR-EMA.bat
+          find site -name '.DS_Store' -delete
+
+      - name: Quitar el segundo codigo de TODOS los productos
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          APP="site/app.js"
+
+          # No guardar el segundo código en nuevos registros.
+          sed -i "s/codigo: item\.code, descripcion: item\.name,/codigo: '', descripcion: item.name,/" "$APP"
+          sed -i "s/codigo: cleanText(item\.codigo),/codigo: '',/" "$APP"
+
+          # Eliminar el renglón visual "Cód. ..." de la factura.
+          BEFORE="$(grep -c 'class="cod"' "$APP" || true)"
+          test "$BEFORE" -ge 1
+          sed -i '/class="cod"/d' "$APP"
+          AFTER="$(grep -c 'class="cod"' "$APP" || true)"
+          test "$AFTER" -eq 0
+
+          node --check "$APP"
+
+          # Mantener el resto de EMA intacto.
+          test -s site/index.html
+          test -s site/app.js
+          test -s site/styles.css
+
+          printf '%s\n' "Segundo código eliminado. Coincidencias restantes: $AFTER"
+
+      - name: Configurar Pages
+        uses: actions/configure-pages@v5
+
+      - name: Subir sitio
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+      - name: Publicar sitio
+        id: deployment
+        uses: actions/deploy-pages@v4
