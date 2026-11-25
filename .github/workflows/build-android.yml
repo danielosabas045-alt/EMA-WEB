@@ -16,6 +16,8 @@ jobs:
     steps:
       - name: Descargar código
         uses: actions/checkout@v4
+        with:
+          persist-credentials: false
 
       - name: Configurar Python
         uses: actions/setup-python@v5
@@ -23,7 +25,9 @@ jobs:
           python-version: '3.12'
 
       - name: Preparar EMA Android local
-        run: python3 android_prepare.py
+        run: |
+          unzip -q EMA-Enterprise.zip -d "$RUNNER_TEMP/ema-source"
+          python3 "$RUNNER_TEMP/ema-source/EMA-Enterprise/android_prepare.py"
 
       - name: Configurar Java 17
         uses: actions/setup-java@v6
@@ -51,9 +55,9 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          gradle :app:assembleDebug --no-daemon --stacktrace
+          gradle --project-dir "$RUNNER_TEMP/ema-source/EMA-Enterprise" :app:assembleDebug --no-daemon --stacktrace
           mkdir -p dist
-          cp app/build/outputs/apk/debug/app-debug.apk dist/EMA-Mayoreo.apk
+          cp "$RUNNER_TEMP/ema-source/EMA-Enterprise/app/build/outputs/apk/debug/app-debug.apk" dist/EMA-Mayoreo.apk
           ls -lh dist/EMA-Mayoreo.apk
 
       - name: Publicar APK
