@@ -1,0 +1,8 @@
+/site/
+/.android-stage/
+/app/src/main/assets/ema/
+/dist/
+/.gradle/
+/app/build/
+__pycache__/
+/EMA-Enterprise.zip

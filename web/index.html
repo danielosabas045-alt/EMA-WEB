@@ -1,0 +1,360 @@
+<!doctype html>
+<html lang="es-GT">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, interactive-widget=resizes-content">
+  <meta name="description" content="EMA · Sistema de pedidos y control comercial de Mayoreo Electrónico, S.A.">
+  <meta name="theme-color" content="#17233d">
+  <meta name="color-scheme" content="light dark">
+  <meta name="application-name" content="EMA · Pedidos">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="EMA">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="format-detection" content="telephone=no">
+
+  <title>EMA Enterprise — Next Generation</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <link rel="manifest" href="manifest.json">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self'; worker-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-src 'none'">
+  <link rel="stylesheet" href="styles.css"><link rel="stylesheet" href="enterprise.css">
+</head>
+<body class="loading">
+
+  <!-- Sprite de iconos (se usa con <use href="#i-...">) -->
+  <svg xmlns="http://www.w3.org/2000/svg" style="display:none" aria-hidden="true" focusable="false">
+    <symbol id="i-print" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="6 9 6 2 18 2 18 9"/>
+      <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/>
+      <rect x="6" y="14" width="12" height="8"/>
+    </symbol>
+  </svg>
+
+  <a class="skip-link" href="#mainContent">Ir al contenido principal</a>
+  <aside id="rail">
+    <a class="wordmark" href="#resumen"><img src="favicon.svg" width="42" height="42" alt=""><span>EMA<strong>Enterprise</strong></span></a>
+    <nav aria-label="Principal"><button class="tab" data-tab="resumen" id="tab-btn-resumen" title="Resumen"><svg viewBox="0 0 24 24" class="ui-icon" aria-hidden="true"><path d="M3 3h7v7H3z M14 3h7v7h-7z M3 14h7v7H3z M14 14h7v7h-7z"/></svg><span>Resumen</span></button><button class="tab" data-tab="pedidos" id="tab-btn-pedidos" title="Pedidos"><svg viewBox="0 0 24 24" class="ui-icon" aria-hidden="true"><path d="M5 5h14v16l-3-2-4 2-4-2-3 2z M8 9h8 M8 13h6"/></svg><span>Pedidos</span></button><button class="tab" data-tab="historial" id="tab-btn-historial" title="Historial"><svg viewBox="0 0 24 24" class="ui-icon" aria-hidden="true"><path d="M4 9a8 8 0 1 1 0 6 M3 4v6h6 M12 7v5l3 2"/></svg><span>Historial</span></button><button class="tab" data-tab="catalogos" id="tab-btn-catalogos" title="Catálogos"><svg viewBox="0 0 24 24" class="ui-icon" aria-hidden="true"><path d="M3 6l9-4 9 4-9 4z M3 11l9 4 9-4 M3 16l9 4 9-4"/></svg><span>Catálogos</span></button><button class="tab" data-tab="reportes" id="tab-btn-reportes" title="Reportes"><svg viewBox="0 0 24 24" class="ui-icon" aria-hidden="true"><path d="M4 20V4 M4 20h16 M8 16v-4 M13 16V7 M18 16v-7"/></svg><span>Reportes</span></button><button class="tab" data-tab="asistente" id="tab-btn-asistente" title="Asistente EMA"><svg viewBox="0 0 24 24" class="ui-icon" aria-hidden="true"><path d="M12 2l2.5 6.5L21 11l-6.5 2.5L12 20l-2.5-6.5L3 11l6.5-2.5z"/></svg><span>Asistente EMA</span></button><button class="tab" data-tab="actividad" id="tab-btn-actividad" title="Actividad"><svg viewBox="0 0 24 24" class="ui-icon" aria-hidden="true"><path d="M2 12h5l3-8 4 16 3-8h5"/></svg><span>Actividad</span></button></nav><div class="rail-foot"><span class="local-dot"></span><span>Datos en este dispositivo</span></div></aside>
+    <button id="scrim" aria-label="Cerrar menú"></button>
+    <header class="command"><button type="button" id="menu" class="square" aria-label="Menú principal" aria-controls="rail" aria-expanded="false"><svg viewBox="0 0 24 24" class="ui-icon" aria-hidden="true"><path d="M3 6h18 M3 12h18 M3 18h18"/></svg></button><span class="mobile-brand">EMA</span><span id="crumb">Resumen</span><button id="globalSearch" aria-label="Buscar pedidos"><svg viewBox="0 0 24 24" class="ui-icon" aria-hidden="true"><path d="M16 16l5 5 M18 10a8 8 0 1 1-16 0 8 8 0 1 1 16 0"/></svg> <span>Buscar pedidos</span> <kbd>/</kbd></button><button class="square" id="theme" aria-label="Modo oscuro"><svg viewBox="0 0 24 24" class="ui-icon" aria-hidden="true"><path d="M20 15a8 8 0 0 1-11-11 9 9 0 1 0 11 11z"/></svg></button></header><div class="device-status"><svg viewBox="0 0 24 24" class="ui-icon" aria-hidden="true"><path d="M6 10h12v10H6z M8 10V7a4 4 0 0 1 8 0v3m-4 4v2"/></svg> <span>Datos en este dispositivo</span><span id="systemStatusText" role="status">Cargando</span></div>
+    <input id="fileInput" type="file" accept=".xls,.xlsx,.xlsm,.xlsb,.csv,.json,.html,.htm" hidden>
+    <main class="shell" id="mainContent" tabindex="-1">
+    <section id="tab-resumen" class="tab-panel">
+    <div class="pagehead"><div><p class="edition">EMA Enterprise · Next Generation</p><h1>Resumen comercial</h1></div>
+      <button id="demo" class="quiet">Explorar demo</button>
+    </div>
+    <div class="quick-actions" aria-label="Acciones de pedidos">
+      <button id="quickOrder" class="quick-action primary-action"><span class="action-icon"><svg viewBox="0 0 24 24" class="ui-icon" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></span><span><strong>Crear pedido</strong><small>Ingresá un pedido manual</small></span><svg viewBox="0 0 24 24" class="ui-icon" aria-hidden="true"><path d="M4 12h15m-6-6 6 6-6 6"/></svg></button>
+      <button id="btnOpenImport" class="quick-action"><span class="action-icon"><svg viewBox="0 0 24 24" class="ui-icon" aria-hidden="true"><path d="M12 16V3m-5 5 5-5 5 5M4 16v5h16v-5"/></svg></span><span><strong>Importar archivo</strong><small>Revisá los datos antes de guardar</small></span><svg viewBox="0 0 24 24" class="ui-icon" aria-hidden="true"><path d="M4 12h15m-6-6 6 6-6 6"/></svg></button>
+      <button id="quickFind" class="quick-action"><span class="action-icon"><svg viewBox="0 0 24 24" class="ui-icon" aria-hidden="true"><path d="M16 16l5 5 M18 10a7 7 0 1 1-14 0 7 7 0 1 1 14 0"/></svg></span><span><strong>Buscar un pedido</strong><small>Consultá los pedidos guardados</small></span><svg viewBox="0 0 24 24" class="ui-icon" aria-hidden="true"><path d="M4 12h15m-6-6 6 6-6 6"/></svg></button>
+    </div>
+    <section class="scope-panel" aria-labelledby="scopeHeading"><div class="scope-head"><h2 id="scopeHeading">Selección comercial</h2><span id="scopeLabel"></span></div><div class="filterstrip"><label>Desde<input id="from" type="date"></label><label>Hasta<input id="to" type="date"></label><label>Vendedor<select id="dashSeller"></select></label><label>Sucursal<select id="dashBranch"></select></label><button id="resetDash" class="quiet">Restablecer</button></div></section>
+    <p id="sampleNote" class="notice" hidden>Demostración con pedidos ficticios. Los datos locales se conservan por separado.</p>
+    <div class="stats"><article class="tile"><div class="metric-icon"><svg viewBox="0 0 24 24" class="ui-icon" aria-hidden="true"><path d="M3 17l6-6 4 3 8-9 M15 5h6v6"/></svg></div><span>Ventas totales</span><strong id="k0">—</strong><small id="ks0">Valor de los pedidos</small></article><article class="tile"><div class="metric-icon"><svg viewBox="0 0 24 24" class="ui-icon" aria-hidden="true"><path d="M5 5h14v16l-3-2-4 2-4-2-3 2z M8 9h8 M8 13h6"/></svg></div><span>Pedidos</span><strong id="k1">—</strong><small id="ks1">En la selección</small></article><article class="tile"><div class="metric-icon"><svg viewBox="0 0 24 24" class="ui-icon" aria-hidden="true"><path d="M14 8a3 3 0 1 1-6 0 3 3 0 1 1 6 0 M4 20v-2a7 7 0 0 1 14 0v2 M17 5a3 3 0 0 1 1 6 M19 14a5 5 0 0 1 3 5"/></svg></div><span>Clientes</span><strong id="k2">—</strong><small id="ks2">Con pedidos</small></article><article class="tile"><div class="metric-icon"><svg viewBox="0 0 24 24" class="ui-icon" aria-hidden="true"><path d="M3 6h18v4a2 2 0 0 0 0 4v4H3v-4a2 2 0 0 0 0-4z M15 8v2 M15 13v2"/></svg></div><span>Ticket promedio</span><strong id="k3">—</strong><small id="ks3">Venta por pedido</small></article></div>
+    <div class="charts"><article class="surface"><div class="card-head"><h2>Evolución mensual</h2><select id="chartMode" aria-label="Tipo de gráfico"><option value="area">Área</option><option value="linea">Línea</option><option value="barras">Barras</option></select></div><div id="trendChart"></div><p id="trendNote" class="fine-print" hidden></p></article>
+    <article class="surface"><div class="card-head"><h2>Rendimiento</h2><select id="rankBy" aria-label="Agrupar distribución"><option value="vendedor">Vendedor</option><option value="sucursal">Sucursal</option><option value="producto">Producto</option></select></div><div id="rankChart"></div><p id="rankNote" class="fine-print" hidden></p></article></div>
+    <article class="surface"><div class="card-head"><h2>Pedidos recientes</h2><button id="seeOrders" class="quiet">Ver selección</button></div><div id="recent"></div></article></section>
+    <section id="tab-catalogos" class="tab-panel" hidden><div class="pagehead"><div><h1>Catálogos</h1></div><button class="accent" id="newEntity">Agregar registro</button></div><div class="surface"><div class="filterstrip"><label>Catálogo<select id="entityType"><option value="cliente">Clientes</option><option value="vendedor">Vendedores</option><option value="producto">Productos</option><option value="sucursal">Sucursales</option></select></label><label>Buscar<input id="entitySearch" type="search"></label></div><div id="entities"></div></div></section>
+    <section id="tab-reportes" class="tab-panel" hidden><div class="pagehead"><div><h1>Reportes</h1><p>Agrupá los pedidos de la selección comercial y exportá el informe.</p></div></div><div class="surface"><div class="filterstrip"><label>Agrupar por<select id="reportGroup"><option value="dia">Día</option><option value="mes">Mes</option><option value="vendedor">Vendedor</option><option value="sucursal">Sucursal</option><option value="producto">Producto</option></select></label><button class="quiet" id="reportFilters">Editar filtros</button><button class="quiet" id="reportXls">Excel</button><button class="accent" id="reportPdf">PDF</button></div><p id="reportScope" class="fine-print"></p><div id="report"></div></div></section>
+    <section id="tab-asistente" class="tab-panel" hidden><div class="pagehead"><div><h1>Asistente EMA</h1><p>Consultá cómo se calculan las cifras y qué pedidos las respaldan.</p></div></div><div class="surface"><label>Consulta<select id="question"><option value="resumen">Resumen ejecutivo</option><option value="comparar">Comparar meses</option><option value="calidad">Detectar inconsistencias</option><option value="proyeccion">Estimar ventas</option><option value="indicadores">Explicar indicadores</option></select></label><div id="answer" aria-live="polite"></div><div id="answerSources"></div></div></section>
+    <section id="tab-actividad" class="tab-panel" hidden><div class="pagehead"><div><h1>Actividad</h1><p>Últimos 120 movimientos registrados en este dispositivo.</p></div><div class="actions"><button id="btnRestoreActivity" class="quiet">Restaurar respaldo</button><button id="btnBackup" class="accent">Descargar respaldo</button></div></div><div class="surface" id="auditLog"></div></section>
+        <section id="tab-pedidos" class="tab-panel" hidden aria-labelledby="tab-btn-pedidos">
+      <div class="pagehead">
+        <div><h1>Pedidos</h1><p id="positionHint">Creá o importá un pedido para empezar.</p></div>
+        <div class="actions"><button class="quiet" id="btnImportPrimary"><svg viewBox="0 0 24 24" class="ui-icon" aria-hidden="true"><path d="M12 16V3m-5 5 5-5 5 5M4 16v5h16v-5"/></svg> Importar archivo</button><button class="accent" id="newOrder"><svg viewBox="0 0 24 24" class="ui-icon" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg> Crear pedido</button></div>
+      </div>
+      <section class="import-panel card" id="importPanel" aria-label="Importación">
+        <button id="dropZone" class="drop-hint">Soltá un archivo o seleccionalo <small>XLS, XLSX, XLSM, XLSB, CSV, JSON o HTML · hasta 20 MiB</small></button>
+        <button id="readError" class="quiet" hidden>Descargar error de lectura</button>
+        <button id="abortRead" class="quiet" hidden>Cancelar lectura</button>
+        <progress id="readProgress" aria-label="Lectura del archivo" hidden></progress>
+        <div id="importStatus" class="import-status" role="status"></div>
+      </section>
+      <section id="orderToolbar" class="toolbar card" aria-label="Navegación y documentos">
+        <div class="toolbar-left">
+          <button type="button" class="btn small secondary" id="btnFirst" aria-label="Ir al primer pedido">
+            Primero
+          </button>
+          <button type="button" class="btn small secondary" id="btnPrev" aria-label="Ir al pedido anterior">
+            <span aria-hidden="true">←</span> Anterior
+          </button>
+          <label class="jump">
+            <span id="jumpLabel">Ir al pedido</span>
+            <select id="quoteJump" aria-label="Seleccionar pedido">
+              <option value="">Sin pedidos</option>
+            </select>
+          </label>
+          <button type="button" class="btn small secondary" id="btnNext" aria-label="Ir al siguiente pedido">
+            Siguiente <span aria-hidden="true">→</span>
+          </button>
+          <button type="button" class="btn small secondary" id="btnLast" aria-label="Ir al último pedido">
+            Último
+          </button>
+          <label class="jump seller-jump">
+            <span>Vendedor</span>
+            <select id="quoteSellerFilter" aria-label="Filtrar por vendedor">
+              <option value="todo">Todos</option>
+            </select>
+          </label>
+        </div>
+        <div class="toolbar-right">
+          <button class="btn small secondary" id="editCurrent">Editar pedido</button>
+          <button type="button" class="btn small dark" id="btnPrint">
+            <svg class="ico" width="16" height="16" aria-hidden="true"><use href="#i-print"/></svg> Imprimir
+          </button>
+          <button type="button" class="btn small blue" id="btnPdf">PDF</button>
+          <button type="button" class="btn small blue" id="btnWord">Word</button>
+          <button type="button" class="btn small secondary" id="btnPreviewCurrent">Vista previa</button>
+          <button type="button" class="btn small secondary" id="btnPreviewSeller">Vista por vendedor</button>
+          <button type="button" class="btn small orange" id="btnPrintAll">
+            <svg class="ico" width="16" height="16" aria-hidden="true"><use href="#i-print"/></svg> Imprimir vendedor
+          </button>
+        </div>
+      </section>
+      <section id="sellerDashboard" class="seller-dashboard card" aria-labelledby="seller-dashboard-heading">
+        <div class="seller-title">
+
+          <h3 id="seller-dashboard-heading">Todos los vendedores</h3>
+          <p id="sellerSubtitle">Selecciona un vendedor para ver su producción y ventas.</p>
+        </div>
+        <div class="seller-metrics">
+          <div><span>Pedidos</span><strong id="sellerOrders">0</strong></div>
+          <div><span>Vendido</span><strong id="sellerSales">Q 0.00</strong></div>
+          <div><span>Promedio</span><strong id="sellerAverage">Q 0.00</strong></div>
+          <div><span>Este pedido</span><strong id="sellerCurrent">Q 0.00</strong></div>
+        </div>
+      </section>
+      <div class="workspace-grid">
+        <section class="card invoice-stage" id="invoiceStage" aria-label="Vista del pedido seleccionado">
+          <div class="stage-head">
+            <div>
+
+              <h2>Vista del pedido</h2>
+            </div>
+            <div id="position" class="stage-badge">Sin selección</div>
+          </div>
+          <div id="invoiceWrap" class="invoice-wrap"></div>
+          <div id="emptyState" class="empty">
+
+            <h3>Tu pedido aparecerá aquí</h3>
+            <p>Creá un pedido o importá un archivo para revisar el documento.</p>
+            <button type="button" class="btn primary" id="btnImportEmpty">Importar archivo</button>
+          </div>
+        </section>
+
+        <aside class="side-panel">
+          <section class="card side-card file-card" aria-label="Último archivo importado">
+            <h3>Última importación</h3>
+            <strong id="lastFile">Ninguno</strong>
+            <span id="lastFileMeta">Importa un pedido para verlo aquí.</span>
+          </section>
+        </aside>
+      </div>
+    </section>
+    <section id="tab-historial" class="tab-panel" aria-labelledby="tab-btn-historial" hidden>
+      <div class="hero-row compact">
+        <div>
+
+          <h1>Historial</h1>
+          <p class="hero-copy">Buscá por número, cliente, vendedor, sucursal o producto.</p>
+        </div>
+        <div class="hero-kpi">
+          <span>Registros</span>
+          <strong id="statCount">0 pedidos</strong>
+          <small id="statMonto">Q 0.00</small>
+        </div>
+      </div>
+
+      <form class="filters card" id="filterForm" autocomplete="off">
+        <div class="field">
+          <label for="search">Buscar</label>
+          <input id="search" type="search" placeholder="Número, cliente o producto…"
+                 spellcheck="false" autocomplete="off" autocapitalize="off" autocorrect="off">
+        </div>
+        <div class="field">
+          <label for="sort">Ordenar</label>
+          <select id="sort">
+            <option value="fecha_desc">Más recientes</option>
+            <option value="fecha_asc">Más antiguas</option>
+            <option value="num_asc">Número A-Z</option>
+            <option value="num_desc">Número Z-A</option>
+            <option value="cli_asc">Cliente A-Z</option>
+            <option value="monto_desc">Mayor monto</option>
+            <option value="monto_asc">Menor monto</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="dateFilter">Fecha</label>
+          <select id="dateFilter">
+            <option value="todo">Todas</option>
+            <option value="hoy">Hoy</option>
+            <option value="semana">Últimos 7 días</option>
+            <option value="mes">Últimos 30 días</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="sellerFilter">Vendedor</label>
+          <select id="sellerFilter">
+            <option value="todo">Todos</option>
+          </select>
+        </div>
+        <button type="reset" class="btn secondary" id="btnReset">Restablecer</button>
+
+      </form>
+
+      <div class="history-bar">
+        <div class="pager"><button id="pagePrev" class="quiet">Anterior</button><span id="pageNumber"></span><button id="pageNext" class="quiet">Siguiente</button></div><span id="counter">Mostrando 0 de 0 pedidos</span>
+        <div>
+          <button type="button" class="btn small secondary" id="btnHistoryPrint">
+            <svg class="ico" width="16" height="16" aria-hidden="true"><use href="#i-print"/></svg> Imprimir resultados
+          </button>
+          <button type="button" class="btn small secondary" id="btnClear">Vaciar pedidos</button>
+          <button type="button" class="btn small secondary" id="btnRestore">Restaurar respaldo</button>
+          <input id="restoreInput" type="file" accept=".json,application/json" hidden
+                 aria-label="Restaurar respaldo desde archivo JSON">
+        </div>
+      </div>
+
+      <section class="card table-card">
+        <div class="table-scroll" tabindex="0" role="region" aria-label="Tabla desplazable">
+          <table class="history-table">
+            <thead>
+              <tr>
+                <th scope="col">N. pedido</th>
+                <th scope="col">Fecha</th>
+                <th scope="col">Cliente</th>
+                <th scope="col">Sucursal</th>
+                <th scope="col">Vendedor</th>
+                <th scope="col">Total</th>
+                <th scope="col">Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="historyBody"></tbody>
+          </table>
+        </div>
+        <div id="historyEmpty" class="empty small-empty" hidden>
+          <h3>No hay pedidos guardados</h3>
+          <p>Creá un pedido o ajustá la búsqueda.</p>
+        </div>
+      </section>
+
+      <section class="card import-history-card" aria-labelledby="import-history-heading">
+        <div class="import-history-head">
+          <div>
+
+            <h3 id="import-history-heading">Archivos importados</h3>
+            <p>Revisá la fecha, los pedidos y el total de cada carga.</p>
+          </div>
+          <strong id="importHistoryCount">0 cargas</strong>
+        </div>
+        <div class="table-scroll" tabindex="0" role="region" aria-label="Tabla desplazable">
+          <table class="history-table import-history-table">
+            <thead>
+              <tr>
+                <th>Fecha y hora</th>
+                <th>Archivo</th>
+                <th>Modo</th>
+                <th>Pedidos</th>
+                <th>Total</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="importHistoryBody"></tbody>
+          </table>
+        </div>
+        <div id="importHistoryEmpty" class="empty small-empty" hidden>
+          <h3>Aún no hay cargas registradas</h3>
+          <p>Cuando importes un Excel aparecerá aquí.</p>
+        </div>
+      </section>
+    </section>
+  </main>
+  <dialog id="modalBg" class="modal-bg" aria-labelledby="modalTitle">
+    <div class="modal card">
+      <button type="button" class="modal-x" id="modalX" aria-label="Cerrar diálogo">×</button>
+      <h3 id="modalTitle" tabindex="-1">¿Deseas continuar?</h3>
+      <div id="modalBody" class="modal-body"></div>
+      <div class="modal-actions">
+        <button type="button" class="btn secondary" id="modalCancel">Cancelar</button>
+        <button type="button" class="btn danger" id="modalOk">Confirmar</button>
+      </div>
+    </div>
+  </dialog>
+  <dialog id="previewBg" class="modal-bg" aria-labelledby="previewTitle">
+    <div class="modal wide card">
+      <button type="button" class="modal-x" id="previewX" aria-label="Cerrar diálogo">×</button>
+      <h3 id="previewTitle" tabindex="-1">Revisar importación</h3>
+      <div id="previewInfo" class="preview-info"></div>
+      <p id="validation"></p><button class="quiet" id="issueReport" hidden>Descargar observaciones</button><div id="previewTable" class="preview-table" tabindex="0" role="region" aria-label="Pedidos de la importación"></div>
+      <div class="preview-foot">
+        <p id="previewNote"></p>
+        <div class="modal-actions import-choice-actions">
+          <button type="button" class="btn secondary" id="previewCancel">Cancelar</button>
+          <button type="button" class="btn secondary" id="previewAppend">Agregar a la base</button>
+          <button type="button" class="btn primary" id="previewReplace">Reemplazar pedidos</button>
+        </div>
+      </div>
+    </div>
+  </dialog>
+  <dialog id="importHistoryPreviewBg" class="modal-bg" aria-labelledby="importHistoryPreviewTitle">
+    <div class="modal wide card">
+      <button type="button" class="modal-x" id="importHistoryPreviewX" aria-label="Cerrar diálogo">×</button>
+      <h3 id="importHistoryPreviewTitle" tabindex="-1">Detalle de la carga</h3>
+      <div id="importHistoryPreviewInfo" class="preview-info"></div>
+      <div id="importHistoryPreviewTable" class="preview-table" tabindex="0" role="region" aria-label="Pedidos de la importación"></div>
+      <div class="modal-actions">
+        <button type="button" class="btn secondary" id="importHistoryPreviewClose">Cerrar</button>
+      </div>
+    </div>
+  </dialog>
+  <dialog id="invoicePreviewBg" class="modal-bg" aria-labelledby="invoicePreviewTitle">
+    <div class="modal invoice-preview-modal card">
+      <button type="button" class="modal-x" id="invoicePreviewX" aria-label="Cerrar diálogo">×</button>
+      <h3 id="invoicePreviewTitle" tabindex="-1">Pedido</h3>
+      <div id="invoicePreviewFrame" class="invoice-preview-frame"></div>
+      <div class="modal-actions">
+        <button type="button" class="btn secondary" id="invoicePreviewClose">Cerrar</button>
+        <button type="button" class="btn primary" id="invoicePreviewPrint">
+          <svg class="ico" width="16" height="16" aria-hidden="true"><use href="#i-print"/></svg> Imprimir esta vista
+        </button>
+      </div>
+    </div>
+  </dialog>
+  <dialog id="sellerPreviewBg" class="modal-bg" aria-labelledby="sellerPreviewTitle">
+    <div class="modal invoice-preview-modal card">
+      <button type="button" class="modal-x" id="sellerPreviewX" aria-label="Cerrar diálogo">×</button>
+      <h3 id="sellerPreviewTitle" tabindex="-1">Pedidos del vendedor</h3>
+      <div class="seller-preview-nav">
+        <button type="button" class="btn small secondary" id="sellerPreviewPrev" aria-label="Pedido anterior del vendedor">
+          <span aria-hidden="true">←</span> Anterior
+        </button>
+        <span id="sellerPreviewPosition" aria-live="polite">0 de 0</span>
+        <button type="button" class="btn small secondary" id="sellerPreviewNext" aria-label="Siguiente pedido del vendedor">
+          Siguiente <span aria-hidden="true">→</span>
+        </button>
+      </div>
+      <div id="sellerPreviewFrame" class="invoice-preview-frame"></div>
+      <div class="modal-actions">
+        <button type="button" class="btn secondary" id="sellerPreviewClose">Cerrar</button>
+        <button type="button" class="btn primary" id="sellerPreviewPrint">
+          <svg class="ico" width="16" height="16" aria-hidden="true"><use href="#i-print"/></svg> Imprimir esta vista
+        </button>
+      </div>
+    </div>
+  </dialog>
+  <div id="toast" class="toast" role="alert" aria-live="assertive" hidden></div>
+
+  <noscript>
+    <div class="no-js-message">
+      <h1>EMA necesita JavaScript</h1>
+      <p>Activa JavaScript en el navegador para utilizar el sistema.</p>
+    </div>
+  </noscript>
+
+  <dialog id="editor" aria-labelledby="editTitle"><form id="editForm">
+    <header class="editor-head"><h2 id="editTitle"></h2><button type="button" class="quiet" data-close>Cancelar</button></header>
+    <div id="editFields"></div>
+    <footer class="editor-foot"><p role="alert" id="editError"></p><output id="editTotal" hidden></output><button class="accent">Guardar</button></footer>
+  </form></dialog>
+  <dialog id="finder" aria-labelledby="finderTitle"><div class="card-head"><h2 id="finderTitle">Buscar pedidos</h2><button class="quiet" data-close>Cerrar</button></div><input type="search" id="findText" aria-label="Buscar pedidos, clientes, vendedores y productos"><div id="found"></div></dialog>
+  <script src="parser.js" defer></script><script src="charts.js" defer></script><script src="enterprise.js" defer></script><script src="app.js" defer></script>
+</body></html>

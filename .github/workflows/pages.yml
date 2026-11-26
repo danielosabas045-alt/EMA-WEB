@@ -21,10 +21,16 @@ jobs:
           persist-credentials: false
       - name: Compilar EMA Enterprise desde el código editable
         run: |
-          unzip -q EMA-Enterprise.zip -d "$RUNNER_TEMP/ema-source"
-          cd "$RUNNER_TEMP/ema-source/EMA-Enterprise"
           for file in web/*.js; do node --check "$file"; done
           python3 build_web.py "$GITHUB_WORKSPACE/site"
+      - name: Empaquetar distribución desde el commit
+        run: git archive --format=zip --prefix=EMA-Enterprise/ -o EMA-Enterprise.zip HEAD web android app tests .github .gitignore README.md build_web.py android_prepare.py android-mobile.css android-mobile.js build.gradle settings.gradle gradle.properties
+      - uses: actions/upload-artifact@v4
+        with:
+          name: EMA-Enterprise-fuentes
+          path: EMA-Enterprise.zip
+          if-no-files-found: error
+          retention-days: 30
       - uses: actions/upload-pages-artifact@v3
         with:
           path: site

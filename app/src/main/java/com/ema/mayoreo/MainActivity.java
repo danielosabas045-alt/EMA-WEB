@@ -12,7 +12,10 @@ import android.util.Base64;
 import android.view.Gravity;
 import android.view.View;
 import android.webkit.CookieManager;
-import android.webkit.DownloadListener;
+import android.webkit.WebResourceResponse;
+import androidx.webkit.WebViewAssetLoader;
+import java.util.ArrayList;
+import java.util.Collections;
 import android.webkit.JavascriptInterface;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
@@ -29,7 +32,13 @@ import android.widget.Toast;
 public class MainActivity extends Activity {
     private static final int FILE_CHOOSER = 4101;
     private static final int SAVE_DOCUMENT = 4102;
-    private static final String HOME_URL = "file:///android_asset/ema/index.html";
+    private static final String APP_ROOT = "https://appassets.androidplatform.net/assets/ema/";
+    private static final String HOME_URL = APP_ROOT + "site/index.html";
+    private static final String MIGRATION_URL = APP_ROOT + "index.html";
+    private static final String LEGACY_URL = "file:///android_asset/ema/index.html";
+    private final ArrayList<String> migrationChunks = new ArrayList<>();
+    private boolean migrating;
+    private WebViewAssetLoader assetLoader;
 
     private WebView webView;
     private WebView printWebView;
@@ -59,7 +68,7 @@ public class MainActivity extends Activity {
         LinearLayout appBar = new LinearLayout(this);
         appBar.setGravity(Gravity.CENTER_VERTICAL);
         appBar.setPadding(dp(12), dp(4), dp(8), dp(4));
-        appBar.setBackgroundColor(Color.rgb(11, 78, 162));
+        appBar.setBackgroundColor(Color.rgb(23, 35, 61));
 
         TextView logo = new TextView(this);
         logo.setText("EMA");
@@ -75,6 +84,8 @@ public class MainActivity extends Activity {
 
         Button refresh = headerButton("↻");
         Button back = headerButton("‹");
+        refresh.setContentDescription("Recargar EMA");
+        back.setContentDescription("Volver al inicio");
 
         appBar.addView(logo, new LinearLayout.LayoutParams(dp(58), dp(50)));
         appBar.addView(screenTitle, new LinearLayout.LayoutParams(0, dp(50), 1f));
@@ -86,9 +97,12 @@ public class MainActivity extends Activity {
             dp(58)
         ));
 
+        assetLoader = new WebViewAssetLoader.Builder()
+            .addPathHandler("/assets/", new WebViewAssetLoader.AssetsPathHandler(this))
+            .build();
         webView = new WebView(this);
         configureWebView(webView);
-        webView.addJavascriptInterface(new AndroidBridge(), "AndroidBridge");
+
 
         root.addView(webView, new LinearLayout.LayoutParams(
             LinearLayout.LayoutParams.MATCH_PARENT, 0, 1f
@@ -107,14 +121,21 @@ public class MainActivity extends Activity {
 
         addNav("⌂", "Inicio", false, v -> home());
         addNav("+", "Pedido", true, v -> newOrder());
-        addNav("▣", "Excel", false, v -> importExcel());
+        addNav("▣", "Importar", false, v -> importExcel());
         addNav("◷", "Historial", false, v -> history());
         addNav("⋯", "Más", false, v -> moreMenu());
 
         refresh.setOnClickListener(v -> reloadFresh());
         back.setOnClickListener(v -> handleBack());
 
-        loadHome();
+        if (isFirstInstall()) {
+            getPreferences(MODE_PRIVATE).edit().putBoolean("enterpriseMigrated", true).apply();
+        }
+        if (getPreferences(MODE_PRIVATE).getBoolean("enterpriseMigrated", false)) {
+            loadHome();
+        } else {
+            migrateLegacy();
+        }
     }
 
     private Button headerButton(String text) {
@@ -140,7 +161,7 @@ public class MainActivity extends Activity {
         b.setGravity(Gravity.CENTER);
         b.setTextColor(primary ? Color.WHITE : Color.rgb(97, 112, 138));
         b.setPadding(0, dp(4), 0, dp(4));
-        b.setBackgroundColor(primary ? Color.rgb(11, 78, 162) : Color.TRANSPARENT);
+        b.setBackgroundColor(primary ? Color.rgb(57, 74, 183) : Color.TRANSPARENT);
         b.setOnClickListener(listener);
         bottomBar.addView(b, new LinearLayout.LayoutParams(0, dp(60), 1f));
     }
@@ -154,15 +175,15 @@ public class MainActivity extends Activity {
         s.setDisplayZoomControls(false);
         s.setLoadWithOverviewMode(false);
         s.setUseWideViewPort(true);
-        s.setAllowFileAccess(true);
-        s.setAllowContentAccess(true);
-        s.setAllowFileAccessFromFileURLs(true);
+        s.setAllowFileAccess(false);
+        s.setAllowContentAccess(false);
+        s.setAllowFileAccessFromFileURLs(false);
         s.setAllowUniversalAccessFromFileURLs(false);
         s.setMediaPlaybackRequiresUserGesture(true);
         s.setTextZoom(100);
         s.setCacheMode(WebSettings.LOAD_DEFAULT);
 
-        CookieManager.getInstance().setAcceptCookie(true);
+        CookieManager.getInstance().setAcceptCookie(false);
 
         view.setBackgroundColor(Color.TRANSPARENT);
         view.setOverScrollMode(View.OVER_SCROLL_NEVER);
@@ -171,15 +192,26 @@ public class MainActivity extends Activity {
 
         view.setWebViewClient(new WebViewClient() {
             @Override
-            public void onPageFinished(WebView view, String url) {
-                view.evaluateJavascript(
-                    "(function(){" +
-                    "document.documentElement.classList.add('ema-android');" +
-                    "if(document.body) document.body.classList.add('ema-android');" +
-                    "document.querySelectorAll('.cod').forEach(function(e){e.remove();});" +
-                    "})();",
-                    null
-                );
+            public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                // In-app navigation is handled by JS. Never open an imported document here.
+                return true;
+            }
+
+            @Override
+            public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
+                return true;
+            }
+
+            @Override
+            public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
+                Uri uri = request.getUrl();
+                if ("GET".equals(request.getMethod()) && uri.toString().startsWith(APP_ROOT)) {
+                    WebResourceResponse response = assetLoader.shouldInterceptRequest(uri);
+                    if (response != null) return response;
+                }
+                // Built-in android_asset URLs are handled by WebView during migration.
+                return new WebResourceResponse("text/plain", "UTF-8", 403, "Forbidden",
+                    Collections.emptyMap(), null);
             }
 
             @Override
@@ -214,13 +246,14 @@ public class MainActivity extends Activity {
                     "application/vnd.ms-excel",
                     "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                     "application/vnd.ms-excel.sheet.macroEnabled.12",
+                    "application/vnd.ms-excel.sheet.binary.macroEnabled.12",
                     "text/csv",
+                    "application/json",
+                    "text/html",
+                    "text/plain",
                     "application/octet-stream"
                 });
-                intent.addFlags(
-                    Intent.FLAG_GRANT_READ_URI_PERMISSION |
-                    Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION
-                );
+                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 
                 try {
                     startActivityForResult(intent, FILE_CHOOSER);
@@ -228,40 +261,20 @@ public class MainActivity extends Activity {
                     fileCallback = null;
                     Toast.makeText(
                         MainActivity.this,
-                        "No se pudo abrir Excel.",
+                        "No se pudo abrir el selector de archivos.",
                         Toast.LENGTH_LONG
                     ).show();
-                    return false;
+                    uploadMsg.onReceiveValue(null);
                 }
 
                 return true;
             }
         });
 
-        view.setDownloadListener(new DownloadListener() {
-            @Override
-            public void onDownloadStart(
-                String url,
-                String userAgent,
-                String contentDisposition,
-                String mimeType,
-                long contentLength
-            ) {
-                try {
-                    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
-                } catch (Exception ignored) {
-                    Toast.makeText(
-                        MainActivity.this,
-                        "Usa Guardar desde EMA.",
-                        Toast.LENGTH_SHORT
-                    ).show();
-                }
-            }
-        });
     }
 
     private void js(String code) {
-        if (webView == null) return;
+        if (webView == null || migrating) return;
         webView.evaluateJavascript(
             "(function(){try{return (" + code + ");}catch(e){return false;}})();",
             null
@@ -274,8 +287,7 @@ public class MainActivity extends Activity {
 
     private void home() {
         setTitle("Inicio");
-        js("window.EMAAndroid?.scrollTop()");
-        webView.loadUrl(HOME_URL + "?v=android-1.4");
+        js("window.EMAAndroid?.home()");
     }
 
     private void newOrder() {
@@ -284,7 +296,7 @@ public class MainActivity extends Activity {
     }
 
     private void importExcel() {
-        setTitle("Importar Excel");
+        setTitle("Importar archivo");
         js("window.EMAAndroid?.openImport()");
     }
 
@@ -329,20 +341,73 @@ public class MainActivity extends Activity {
             .show();
     }
 
+    private boolean isFirstInstall() {
+        try {
+            android.content.pm.PackageInfo info = getPackageManager().getPackageInfo(getPackageName(), 0);
+            return info.firstInstallTime == info.lastUpdateTime;
+        } catch (android.content.pm.PackageManager.NameNotFoundException unavailable) {
+            return false;
+        }
+    }
+
+    private void migrateLegacy() {
+        migrating = true;
+        migrationChunks.clear();
+        webView.removeJavascriptInterface("AndroidBridge");
+        webView.addJavascriptInterface(new MigrationBridge(), "EMAMigration");
+        webView.loadUrl(LEGACY_URL);
+    }
+
+    public class MigrationBridge {
+        @JavascriptInterface public void append(String chunk) {
+            migrationChunks.add(chunk);
+        }
+
+        @JavascriptInterface public void transfer() {
+            runOnUiThread(() -> webView.loadUrl(MIGRATION_URL));
+        }
+
+        @JavascriptInterface public int count() {
+            return migrationChunks.size();
+        }
+
+        @JavascriptInterface public String chunk(int index) {
+            return migrationChunks.get(index);
+        }
+
+        @JavascriptInterface public void complete() {
+            runOnUiThread(() -> {
+                getPreferences(MODE_PRIVATE).edit().putBoolean("enterpriseMigrated", true).apply();
+                loadHome();
+            });
+        }
+
+        @JavascriptInterface public void failed() {
+            runOnUiThread(() -> new android.app.AlertDialog.Builder(MainActivity.this)
+                .setTitle("Migración de pedidos")
+                .setMessage("No se pudieron trasladar los registros locales. La copia anterior sigue guardada en este dispositivo.")
+                .setPositiveButton("Reintentar", (dialog, which) -> migrateLegacy())
+                .setNegativeButton("Cerrar", (dialog, which) -> finish())
+                .setCancelable(false)
+                .show());
+        }
+    }
+
     private void loadHome() {
-        webView.getSettings().setCacheMode(WebSettings.LOAD_DEFAULT);
-        webView.loadUrl(HOME_URL + "?v=android-1.4");
+        migrating = false;
+        migrationChunks.clear();
+        webView.removeJavascriptInterface("EMAMigration");
+        webView.addJavascriptInterface(new AndroidBridge(), "AndroidBridge");
+        webView.loadUrl(HOME_URL);
     }
 
     private void reloadFresh() {
-        webView.clearCache(true);
-        webView.getSettings().setCacheMode(WebSettings.LOAD_NO_CACHE);
-        webView.loadUrl(HOME_URL + "?v=android-1.4");
+        if (!migrating) js("window.EMAAndroid?.reload()");
     }
 
     private void handleBack() {
-        if (webView != null && webView.canGoBack()) {
-            webView.goBack();
+        if (webView != null && !migrating && !"Inicio".contentEquals(screenTitle.getText())) {
+            home();
         } else {
             finish();
         }
@@ -354,6 +419,10 @@ public class MainActivity extends Activity {
     }
 
     private void saveFileWithSystem(String filename, String mime, byte[] bytes) {
+        if (pendingSaveBytes != null) {
+            Toast.makeText(this, "Termina de guardar el documento anterior.", Toast.LENGTH_SHORT).show();
+            return;
+        }
         pendingSaveBytes = bytes;
         pendingSaveMime = mime == null || mime.isEmpty()
             ? "application/octet-stream"
@@ -384,7 +453,11 @@ public class MainActivity extends Activity {
         }
 
         printWebView = new WebView(this);
-        configureWebView(printWebView);
+        WebSettings printSettings = printWebView.getSettings();
+        printSettings.setJavaScriptEnabled(false);
+        printSettings.setAllowContentAccess(false);
+        printSettings.setAllowFileAccess(false);
+        printSettings.setBlockNetworkLoads(true);
 
         printWebView.setWebViewClient(new WebViewClient() {
             @Override
@@ -414,7 +487,7 @@ public class MainActivity extends Activity {
         });
 
         printWebView.loadDataWithBaseURL(
-            "file:///android_asset/ema/",
+            null,
             html,
             "text/html",
             "UTF-8",
@@ -427,11 +500,11 @@ public class MainActivity extends Activity {
         public void saveBase64(String filename, String mime, String base64) {
             try {
                 byte[] data = Base64.decode(base64, Base64.DEFAULT);
-                saveFileWithSystem(
+                runOnUiThread(() -> saveFileWithSystem(
                     filename == null || filename.isEmpty() ? "EMA-archivo" : filename,
                     mime,
                     data
-                );
+                ));
             } catch (Exception error) {
                 runOnUiThread(() -> Toast.makeText(
                     MainActivity.this,

@@ -1,0 +1,5 @@
+PEDIDO,NO. BOLETA,AGENCIA,CLIENTE,DIRECCIÓN,FECHA,FECHA DESPACHO,ESTADO,FECHA RECHAZO,VENDEDOR,DETALLE,CANTIDAD PEDIDO,CANTIDAD DESPACHADA,CONCEPTO DETALLE,TOTAL VENTA SUGERIDA,DESCUENTO,TOTAL DESCUENTO,PRECIO VENTA,TOTAL VENTA
+DEMO-001,,Agencia ficticia,Cliente demo 1,Calle ficticia 1,01/01/2026,,Demo,,Vendedor demo 1,,1,,Producto demo 1,10,0,0,10,10
+DEMO-001,,Agencia ficticia,Cliente demo 1,Calle ficticia 1,01/01/2026,,Demo,,Vendedor demo 1,,2,,Producto demo 2,20,0,0,10,20
+DEMO-002,,Agencia ficticia,Cliente demo 2,Calle ficticia 2,01/01/2026,,Demo,,Vendedor demo 2,,3,,Producto demo 3,30,0,0,10,30
+DEMO-002,,Agencia ficticia,Cliente demo 2,Calle ficticia 2,01/01/2026,,Demo,,Vendedor demo 2,,4,,Producto demo 4,40,0,0,10,40

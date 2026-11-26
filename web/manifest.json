@@ -1,0 +1,30 @@
+{
+  "id": "./",
+  "name": "EMA Enterprise — Next Generation",
+  "short_name": "EMA",
+  "lang": "es-GT",
+  "description": "Pedidos, clientes e indicadores de mayoreo.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f3f5fa",
+  "theme_color": "#17233d",
+  "categories": [
+    "business",
+    "productivity"
+  ],
+  "icons": [
+    {
+      "src": "./icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "./icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
